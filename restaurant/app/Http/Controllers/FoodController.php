@@ -14,7 +14,8 @@ class FoodController extends Controller
      */
     public function index()
     {
-        //
+        $foods = Food::latest()->paginate(10);/*每頁顯示10個項目*/
+        return view('food.index',compact('foods'));
     }
 
     /**
@@ -24,7 +25,7 @@ class FoodController extends Controller
      */
     public function create()
     {
-        //
+        return view('food.create');
     }
 
     /**
@@ -35,7 +36,27 @@ class FoodController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request,[
+            'name'=>'required',
+            'description'=>'required',
+            'price'=>'required|integer',
+            'category'=>'required',
+            'image'=>'required|mimes:png,jpeg,jpg',
+        ]);
+        $image = $request->file('image');
+        $name = time().'.'.$image->getClientOriginalExtension();
+        /*唯一的檔案名稱,getClientOriginalExtension()取得副檔名*/
+        $destinationPath = public_path('/images');
+        /*public/images*/
+        $image->move($destinationPath,$name);
+        Food::create([
+            'name'=>$request->get('name'),
+            'description'=>$request->get('description'),
+            'price'=>$request->get('price'),
+            'category_id'=>$request->get('category'),
+            'image'=>$name,
+        ]);
+        return redirect()->back()->with('message','建立成功!');
     }
 
     /**
@@ -57,7 +78,8 @@ class FoodController extends Controller
      */
     public function edit($id)
     {
-        //
+        $food = Food::find($id);
+        return view('food.edit',compact('food'));
     }
 
     /**
@@ -69,7 +91,39 @@ class FoodController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $this->validate($request,[
+            'name'=>'required',
+            'description'=>'required',
+            'price'=>'required|integer',
+            'category'=>'required',
+            'image'=>'mimes:png,jpeg,jpg'
+        ]);
+        $food = Food::find($id);
+        $name = $food->image;
+
+        if($request->hasFile('image')){
+            $image = $request->file('image');
+            $name = time().'.'.$image->getClientOriginalExtension();
+            $destinationPath = public_path('/images');
+            $image->move($destinationPath,$name);
+        }
+        // $food->name = $request->get('name');
+        // $food->description = $request->get('description');
+        // $food->price = $request->get('price');
+        // $food->category_id = $request->get('category');
+        // $food->image = $name;
+        // $food->save();
+        // return redirect()->route('food.index')->with('message','更新成功!');
+
+        $food->update([
+            'name'=>$request->get('name'),
+            'description'=>$request->get('description'),
+            'price'=>$request->get('price'),
+            'category_id'=>$request->get('category'),
+            'image'=>$name,
+        ]);
+        $food->save();
+        return redirect()->route('food.index')->with('message','更新成功!');
     }
 
     /**
@@ -80,6 +134,8 @@ class FoodController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $food = Food::find($id);
+        $food->delete();
+        return redirect()->route('food.index')->with('message','刪除成功!');
     }
 }

@@ -39,10 +39,17 @@
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ml-auto">
                         <!-- Authentication Links -->
-                        @guest
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                        @if(Auth::check())
+                         <li class="nav-item">
+                                <a class="nav-link" href="{{ route('category.index') }}">{{ __('種類') }}</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('food.index') }}">{{ __('食物項目') }}</a>
+                            </li>
+                        @endif
+
+                        @guest
+
                             @if (Route::has('register'))
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>

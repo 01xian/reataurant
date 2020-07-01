@@ -151,6 +151,8 @@ return [
         'mode'          => '模式',
         'mediums'       => '文章媒體',
         'subject'       => '主旨',
+        'description'   => '描述',
+        'category'      => '類別',
     ],
 
 ];
